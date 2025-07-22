@@ -1,0 +1,6 @@
+user_id,first_name,last_name,email,signup_date,last_login,is_active,role
+1,John,Doe,john.doe@example.com,2023-01-10,2024-07-01,1,admin
+2,Jane,Smith,jane.smith@example.com,2023-03-15,2024-07-15,1,user
+3,Emily,Jones,emily.jones@example.com,2022-11-20,2023-12-30,0,guest
+4,Michael,Brown,michael.brown@example.com,2024-05-05,2024-07-20,1,user
+5,Linda,Johnson,linda.johnson@example.com,2023-07-18,2025-01-01,1,moderator
