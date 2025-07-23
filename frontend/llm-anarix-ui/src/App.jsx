@@ -32,6 +32,7 @@ function App() {
 
       if (data.type === "chart") {
         setChartUrl(`data:image/png;base64,${data.image}`);
+        setResultText(data.message);
       } else if (data.type === "text") {
         const cleanContent = data.message.replace(/^"|"$/g, ""); // Remove outer quotes if any
         const words = cleanContent.split(" ");

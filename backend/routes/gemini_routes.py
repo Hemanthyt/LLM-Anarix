@@ -80,8 +80,9 @@ def run_query(prompt: str):
             img_bytes = fig.to_image(format="png")
             b64_image = base64.b64encode(img_bytes).decode("utf-8")
             fig.write_image(f"chart_{uuid.uuid4()}.png")  # Save to file for debugging
+            final_message = generate_message_from_result(prompt,result)
             print(f"Base64 Image: {b64_image[:30]}...")
-            return JSONResponse(content={"type": "chart", "image": b64_image})
+            return JSONResponse(content={"type": "chart", "image": b64_image,"message": final_message, "chart_type": parsed_info["chart"]})
        
 
     except Exception as e:
