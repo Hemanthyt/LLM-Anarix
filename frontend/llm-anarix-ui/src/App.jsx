@@ -3,25 +3,41 @@ import axios from "axios";
 
 function App() {
   const [prompt, setPrompt] = useState("");
-  const [result, setResult] = useState(null);
+  const [resultText, setResultText] = useState("");
+  const [chartUrl, setChartUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleQuerySubmit = async (e) => {
+  const delayPara = (index, nextWord) => {
+    setTimeout(() => {
+      setResultText((prev) => prev + nextWord);
+    }, 75 * index);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setResultText("");
+    setChartUrl("");
 
     try {
       const queryRes = await axios.post("http://127.0.0.1:8000/ask-gemini/", {
         prompt,
       });
 
-      const message = queryRes.data.response.message;
-      setResult(message);
-    } catch (error) {
-      console.error(error);
-      setResult("Error occurred. Check backend.");
-    }
+      const data = queryRes.data.response;
 
+      if (data.type === "chart") {
+        chartUrl(`data:image/png;base64,${data.image}`);
+      } else if (data.type === "text") {
+        const cleanContent = data.content.replace(/^"|"$/g, ""); // Remove outer quotes if any
+        const words = cleanContent.split(" ");
+        words.forEach((word, idx) => {
+          delayPara(idx, word + " ");
+        });
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    }
     setLoading(false);
   };
 
@@ -32,7 +48,7 @@ function App() {
           AI SQL Assistant
         </h1>
 
-        <form onSubmit={handleQuerySubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <textarea
             rows="3"
             placeholder="Ask something like: Total revenue for each product"
@@ -53,14 +69,25 @@ function App() {
         {loading && (
           <p className="text-center mt-4 text-gray-500">Loading...</p>
         )}
+        {chartUrl && (
+          <div className="mt-6">
+            {chartUrl && (
+              <img
+                src={chartUrl}
+                alt="Generated Chart"
+                className="rounded-lg shadow-md"
+              />
+            )}
+          </div>
+        )}
 
-        {result && (
+        {resultText && (
           <div className="mt-6">
             <h2 className="text-lg font-semibold mb-2 text-gray-700">
               Query Result:
-            </h2>
-            <div className="bg-gray-200 p-3 rounded text-xl text-gray-800 text-center">
-              {result}
+            </h2>{" "}
+            <div className="mt-4 p-4 bg-gray-100 rounded-md text-lg font-medium min-h-[3rem] whitespace-pre-wrap">
+              {resultText}
             </div>
           </div>
         )}

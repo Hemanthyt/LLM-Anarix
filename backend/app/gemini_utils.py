@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
-
+import re
 # Load environment variables from .env file
 load_dotenv()
 
@@ -58,7 +58,34 @@ def generate_message_from_result(prompt: str, result: list[dict]) -> str:
     response = model.generate_content(user_input + " " +system_prompt)
     return response.text.strip()
 
-import re
+
+def prompt_intent(prompt: str):
+    chart_type_prompt = f"""
+        You are a data assistant.
+
+        The database contains the following tables:
+        - ad_sales(date, item_id, ad_sales, impressions, clicks, ad_spend)
+        - total_sales(date, item_id, total_sales, total_units_ordered)
+        - eligibility(eligibility_datetime_utc, item_id, eligibility, message)
+        "You are an expert SQL query generator. Your task is to generate only the raw SQL query as plain text. "
+    "Do not include any explanations, markdown formatting, or comments—return only the SQL query string. "    
+        Given the following user prompt, respond with ONLY a valid JSON object in this format:
+        {{
+        "type": "text" or "chart",
+        "chart": "bar", "line", "pie", or "none",
+        "x_axis": "column_name" or null,
+        "y_axis": "column_name" or null
+        "query": "raw SQL query"     
+    }}
+
+        DO NOT include any text, explanation, markdown, or formatting.
+        Return only raw JSON, without any explanation, code block, or formatting.
+
+        Prompt: {prompt}
+        """
+
+    response = model.generate_content(chart_type_prompt)
+    return response.text  # Normalize to lowercase for consistency
 
 ALLOWED_TABLES = {
     "ad_sales": {"date", "item_id", "ad_sales", "impressions", "clicks", "ad_spend"},
@@ -98,4 +125,4 @@ def check_bounds(prompt: str) -> bool:
     
 
 if __name__ == "__main__":
-    print(generate_sql_from_prompt("Which product had the highest CPC (Cost Per Click)?"))
+    print(prompt_intent("Which product had the highest CPC (Cost Per Click)?"))
