@@ -32,9 +32,8 @@ def run_query(prompt: str):
     try:
         print(f"Received prompt: {prompt}")
         chart_type_response = prompt_intent(prompt)
-        clean_json = extract_json_only(chart_type_response)
         print(f"Intent: {chart_type_response }")
-        parsed_info = json.loads(clean_json)
+        parsed_info = json.loads(chart_type_response)
         
         
 
