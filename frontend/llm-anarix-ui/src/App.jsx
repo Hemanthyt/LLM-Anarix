@@ -24,12 +24,16 @@ function App() {
         prompt,
       });
 
-      const data = queryRes.data.response;
+      const rawResponse = queryRes.data.response;
+      const bodyStr = rawResponse.body; // This is a JSON string
+      console.log("Response from server:", bodyStr);
+      const data = JSON.parse(bodyStr); // Convert string to JSON
+      console.log("Parsed data:", data);
 
       if (data.type === "chart") {
-        chartUrl(`data:image/png;base64,${data.image}`);
+        setChartUrl(`data:image/png;base64,${data.image}`);
       } else if (data.type === "text") {
-        const cleanContent = data.content.replace(/^"|"$/g, ""); // Remove outer quotes if any
+        const cleanContent = data.message.replace(/^"|"$/g, ""); // Remove outer quotes if any
         const words = cleanContent.split(" ");
         words.forEach((word, idx) => {
           delayPara(idx, word + " ");

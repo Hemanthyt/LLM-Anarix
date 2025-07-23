@@ -9,7 +9,7 @@ load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Initialize the model
-model = genai.GenerativeModel(model_name="models/gemini-1.5-flash")
+model = genai.GenerativeModel(model_name="models/gemini-2.5-flash")
 
 
 def generate_sql_from_prompt(prompt: str) -> str:
@@ -52,10 +52,12 @@ def generate_sql_from_prompt(prompt: str) -> str:
 
 def generate_message_from_result(prompt: str, result: list[dict]) -> str:
     system_prompt = (
-        "You are a helpful assistant. Given a user question and result from a database, generate a user-friendly summary."
+        "You are a helpful assistant. Your task is to summarize the result of a database query "
+        "in a clear, user-friendly way. Do not use any markdown, bullet points, or special formatting—"
+        "respond using only plain text. The summary should read naturally and directly answer the user's question."
     )
-    user_input = f"Question: {prompt}\nResult: {result}"
-    response = model.generate_content(user_input + " " +system_prompt)
+    user_input = f"User question: {prompt}\nDatabase result: {result}"
+    response = model.generate_content(system_prompt + "\n" + user_input)
     return response.text.strip()
 
 

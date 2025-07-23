@@ -58,10 +58,7 @@ def run_query(prompt: str):
         if parsed_info["type"] == "text":
             final_message = generate_message_from_result(prompt,result)
             print(f"Final message: {final_message}")
-            return {
-                "type": "text",
-                "message": final_message
-            }
+            return JSONResponse(content={"type": "text", "message": final_message})
         if parsed_info["type"] == "chart":
              # Generate Plotly chart
             df = pd.DataFrame(result)
@@ -82,11 +79,10 @@ def run_query(prompt: str):
             # Convert chart to base64
             img_bytes = fig.to_image(format="png")
             b64_image = base64.b64encode(img_bytes).decode("utf-8")
+            fig.write_image(f"chart_{uuid.uuid4()}.png")  # Save to file for debugging
             print(f"Base64 Image: {b64_image[:30]}...")
             return JSONResponse(content={"type": "chart", "image": b64_image})
-
-
-            
+       
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")

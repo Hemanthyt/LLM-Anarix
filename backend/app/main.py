@@ -32,14 +32,10 @@ def get_total_sales(db: Session = Depends(get_db)):
     result = db.execute(text("SELECT * FROM total_sales")).mappings().all()
     return list(result)
 
-
-
 @app.post("/ask-gemini/")
 async def ask_gemini_endpoint(prompt: str = Body(..., embed=True)):
     response = run_query(prompt)
     return {"response": response}
-
-
 
 if __name__ == "__main__":
     import uvicorn
